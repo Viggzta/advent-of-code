@@ -11,18 +11,18 @@ class Program
         /*
         var input = new List<string>()
         {
-            "3   4",
-            "4   3",
-            "2   5",
-            "1   3",
-            "3   9",
-            "3   3",
+            "7 6 4 2 1",
+            "1 2 7 8 9",
+            "9 7 6 2 1",
+            "1 3 2 4 5",
+            "8 6 4 4 1",
+            "1 3 6 7 9",
             ""
         };
         */
         
-        var input = await InputFetcher.GetAllInputLinesAsync(1, 2024);
-        var day = new Year2024Day1();
+        var input = await InputFetcher.GetAllInputLinesAsync(2, 2024);
+        var day = new Year2024Day2();
         var ans = await day.RunSolution2Async(input);
         Console.WriteLine(ans);
     }
