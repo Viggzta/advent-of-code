@@ -11,13 +11,22 @@ class Program
         /*
         var input = new List<string>()
         {
-            "xmul(2,4)&mul[3,7]!^don't()don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+           "MMMSXXMASM",
+           "MSAMXMSMSA",
+           "AMXSXMAAMM",
+           "MSAMASMSMX",
+           "XMASAMXAMM",
+           "XXAMMXXAMA",
+           "SMSMSASXSS",
+           "SAXAMASAAA",
+           "MAMMMXMMMM",
+           "MXMXAXMASX",
             ""
         };
         */
         
-        var input = await InputFetcher.GetAllInputLinesAsync(3, 2024);
-        var day = new Year2024Day3();
+        var input = await InputFetcher.GetAllInputLinesAsync(4, 2024);
+        var day = new Year2024Day4();
         var ans = await day.RunSolution2Async(input);
         Console.WriteLine(ans);
     }
