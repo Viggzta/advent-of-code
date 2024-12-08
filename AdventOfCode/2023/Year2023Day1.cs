@@ -4,8 +4,6 @@ namespace AdventOfCode._2023;
 
 public class Year2023Day1 : IDay
 {
-    public int DayNumber => 1;
-    
     public Task<string> RunSolution1Async(IList<string> input)
     {
         IList<string> inputLines = input.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();

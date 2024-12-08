@@ -4,8 +4,6 @@ namespace AdventOfCode._2024;
 
 public class Year2024Day8 : IDay
 {
-    public int DayNumber => 8;
-    
     public Task<string> RunSolution1Async(IList<string> input)
     {
         input = input.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).ToList();
@@ -71,7 +69,7 @@ public class Year2024Day8 : IDay
             {
                 var ch = line[x];
 
-                if (ch != '.')
+                if (ch != '.' && ch != '#')
                 {
                     if (!beacons.ContainsKey(ch)) beacons.Add(ch, new List<(int x, int y)>());
                     beacons[ch].Add((x, y));

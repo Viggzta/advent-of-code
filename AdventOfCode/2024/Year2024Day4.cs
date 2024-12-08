@@ -6,8 +6,6 @@ namespace AdventOfCode._2024;
 
 public class Year2024Day4 : IDay
 {
-    public int DayNumber => 4;
-    
     public Task<string> RunSolution1Async(IList<string> input)
     {
         input = input.Take(input.Count - 1).ToList();

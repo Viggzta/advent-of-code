@@ -1,6 +1,4 @@
-﻿using AdventOfCode._2023;
-using AdventOfCode._2024;
-using AdventOfCode.Utility;
+﻿using AdventOfCode.Utility;
 
 namespace AdventOfCode;
 
@@ -8,8 +6,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        /*
-        var input = new List<string>()
+        var manualInput = new List<string>
         {
             "............",
             "........0...",
@@ -25,11 +22,34 @@ class Program
             "............", 
             "", 
         };
-        */
         
-        var input = await InputFetcher.GetAllInputLinesAsync(8, 2024);
-        var day = new Year2024Day8();
-        var ans = await day.RunSolution2Async(input);
+        var type = typeof(IDay);
+        var dayTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(p => type.IsAssignableFrom(p));
+        
+        var year = 2024;
+        var day = 8;
+        var part = 1;
+        var inputType = InputType.Example;
+        string? testExtra = null;
+        
+        var input = inputType switch
+        {
+            InputType.Manual => manualInput,
+            InputType.Example => await InputFetcher.GetTestInputLinesAsync(day, year, testExtra),
+            InputType.Real => await InputFetcher.GetAllInputLinesAsync(day, year),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        var currentDayType = dayTypes.Single(t => t.Name == $"Year{year}Day{day}");
+        var dayInstance = (IDay)Activator.CreateInstance(currentDayType)!;
+        var ans = part switch
+        {
+            1 => await dayInstance.RunSolution1Async(input),
+            2 => await dayInstance.RunSolution2Async(input),
+            _ => throw new ArgumentOutOfRangeException()
+        };
         Console.WriteLine(ans);
+        Console.WriteLine("Done!");
     }
 }

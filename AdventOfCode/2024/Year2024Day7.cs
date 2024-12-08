@@ -4,8 +4,6 @@ namespace AdventOfCode._2024;
 
 public class Year2024Day7 : IDay
 {
-    public int DayNumber => 7;
-
     public long SolveAsync(IList<string> input, Dictionary<char, Func<long, long, long>> operators)
     {
         List<(long expected, List<long> values)> lines = input
