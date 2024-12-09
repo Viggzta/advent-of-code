@@ -29,9 +29,9 @@ class Program
             .Where(p => type.IsAssignableFrom(p));
         
         var year = 2024;
-        var day = 8;
-        var part = 1;
-        var inputType = InputType.Example;
+        var day = 9;
+        var part = 2;
+        var inputType = InputType.Real;
         string? testExtra = null;
         
         var input = inputType switch
