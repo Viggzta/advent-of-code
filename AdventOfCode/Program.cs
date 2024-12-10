@@ -31,8 +31,8 @@ internal class Program
 
 		var year = 2024;
 		var day = 10;
-		var part = 1;
-		var inputType = InputType.Manual;
+		var part = 2;
+		var inputType = InputType.Real;
 		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
