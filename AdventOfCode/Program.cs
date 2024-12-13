@@ -9,18 +9,7 @@ internal class Program
 	{
 		var manualInput = new List<string>
 		{
-"BBBBBBBBBKKKYYY",
-"BBBBBBBBBKKKKKY",
-"BBBBBBBBKKKKKKY",
-"BBBBBBBKKKKKYYY",
-"BBBBBKKKKKKKRRR",
-"BBBBBKKKKKKRRRR",
-"BBBKKKKKKRKKRRR",
-"BBBKKKKKRRKRRRR",
-"BBBKKKKKKRRRRRR",
-"BBBNNKKKKRRRRRR",
-"BNNNNKKKRRYRRRR",
-"BNNNNKNNRRRRRRR",
+"123444-123445",
 			""
 		};
 
@@ -29,8 +18,8 @@ internal class Program
 			.SelectMany(s => s.GetTypes())
 			.Where(p => type.IsAssignableFrom(p));
 
-		var year = 2024;
-		var day = 13;
+		var year = 2019;
+		var day = 4;
 		var part = 2;
 		var inputType = InputType.Real;
 		string? testExtra = null;
