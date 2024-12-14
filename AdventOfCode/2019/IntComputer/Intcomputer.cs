@@ -2,33 +2,62 @@ namespace AdventOfCode._2019.IntComputer;
 
 public class Intcomputer
 {
-	private List<int> _memory;
-	private int _instructionPointer;
-	private static List<int> _outputBuffer = [];
+	private readonly Dictionary<
+		int,
+		Func<
+			List<int>,
+			Dictionary<int, int>,
+			int,
+			Task<int>>> _operations;
 
-	public Intcomputer(List<int> memory)
+	private List<int> _memory;
+	private readonly Func<Intcomputer, Task<int>> _inputAction;
+	private readonly Func<int, Task> _outputAction;
+	private int _instructionPointer;
+	private readonly List<int> _outputBuffer;
+
+	public Intcomputer(
+		List<int> memory,
+		Func<Intcomputer, Task<int>>? inputAction = null,
+		Func<int, Task>? outputAction = null)
 	{
-		_memory = memory;
+		_memory = memory.ToList();
+		_inputAction = inputAction ?? DefaultInputAction;
+		_outputAction = outputAction ?? DefaultOutputAction;
+		_outputBuffer = [];
 		_instructionPointer = 0;
+		_operations = new Dictionary<int, Func<List<int>, Dictionary<int, int>, int, Task<int>>>
+		{
+			{ 1, Add },
+			{ 2, Mul },
+			{ 3, Input },
+			{ 4, Output },
+			{ 5, JmpIfTrue },
+			{ 6, JmpIfFalse },
+			{ 7, LessThan },
+			{ 8, IsEq },
+		};
+	}
+
+	private Task<int> DefaultInputAction(Intcomputer intcomputer)
+	{
+		Console.WriteLine("Input:");
+		return Task.FromResult(int.Parse(Console.ReadLine() ?? throw new InvalidOperationException()));
+	}
+
+	private Task DefaultOutputAction(int output)
+	{
+		return Task.CompletedTask;
 	}
 
 	public int GetAtAddress(int index) => _memory[index];
 
 	public List<int> GetOutputBuffer() => _outputBuffer.ToList();
+	public string GetOutputBufferAsString() => string.Join("", _outputBuffer);
 
-	private readonly Dictionary<int, Func<List<int>, Dictionary<int, int>, int, int>> _operations = new()
-	{
-		{ 1, Add },
-		{ 2, Mul },
-		{ 3, Input },
-		{ 4, Output },
-		{ 5, JmpIfTrue },
-		{ 6, JmpIfFalse },
-		{ 7, LessThan },
-		{ 8, IsEq },
-	};
+	public List<int> DumpMemory() => _memory.ToList();
 
-	public void Run()
+	public async Task RunAsync()
 	{
 		var preOpCode = _memory[_instructionPointer];
 		int opcode;
@@ -37,12 +66,12 @@ public class Intcomputer
 
 		while (opcode != 99)
 		{
-			_instructionPointer += _operations[opcode](_memory, paramModes, _instructionPointer);
+			_instructionPointer += await _operations[opcode](_memory, paramModes, _instructionPointer);
 			(paramModes, opcode) = GetInstructions(_memory[_instructionPointer]);
 		}
 	}
 
-	private static (Dictionary<int, int> paramModes, int opcode) GetInstructions(int preOpCode)
+	private (Dictionary<int, int> paramModes, int opcode) GetInstructions(int preOpCode)
 	{
 		Dictionary<int, int> paramModes;
 		int opcode;
@@ -65,7 +94,7 @@ public class Intcomputer
 		return (paramModes, opcode);
 	}
 
-	private static int Add(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<int> Add(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
@@ -75,10 +104,10 @@ public class Intcomputer
 			: mem[mem[instructionPointer + 2]];
 
 		mem[mem[instructionPointer + 3]] = a + b;
-		return 4;
+		return Task.FromResult(4);
 	}
 
-	private static int Mul(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<int> Mul(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
@@ -88,27 +117,27 @@ public class Intcomputer
 			: mem[mem[instructionPointer + 2]];
 
 		mem[mem[instructionPointer + 3]] = a * b;
-		return 4;
+		return Task.FromResult(4);
 	}
 
-	private static int Input(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private async Task<int> Input(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
-		Console.WriteLine("Input:");
-		var input = int.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
+		var input = await _inputAction(this);
 		mem[mem[instructionPointer + 1]] = input;
 		return 2;
 	}
 
-	private static int Output(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private async Task<int> Output(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
 			: mem[mem[instructionPointer + 1]];
 		_outputBuffer.Add(a);
+		await _outputAction(a);
 		return 2;
 	}
 
-	private static int JmpIfTrue(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<int> JmpIfTrue(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
@@ -117,12 +146,13 @@ public class Intcomputer
 			? mem[instructionPointer + 2]
 			: mem[mem[instructionPointer + 2]];
 
-		return a != 0
+		var step = a != 0
 			? -instructionPointer + b
 			: 3;
+		return Task.FromResult(step);
 	}
 
-	private static int JmpIfFalse(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<int> JmpIfFalse(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
@@ -131,12 +161,13 @@ public class Intcomputer
 			? mem[instructionPointer + 2]
 			: mem[mem[instructionPointer + 2]];
 
-		return a == 0
+		var step = a == 0
 			? -instructionPointer + b
 			: 3;
+		return Task.FromResult(step);
 	}
 
-	private static int LessThan(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<int> LessThan(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
@@ -147,10 +178,10 @@ public class Intcomputer
 
 		mem[mem[instructionPointer + 3]] = a < b ? 1 : 0;
 
-		return 4;
+		return Task.FromResult(4);
 	}
 
-	private static int IsEq(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<int> IsEq(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
 	{
 		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
 			? mem[instructionPointer + 1]
@@ -161,6 +192,6 @@ public class Intcomputer
 
 		mem[mem[instructionPointer + 3]] = a == b ? 1 : 0;
 
-		return 4;
+		return Task.FromResult(4);
 	}
 }

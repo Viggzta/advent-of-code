@@ -9,7 +9,7 @@ internal class Program
 	{
 		var manualInput = new List<string>
 		{
-"3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9",
+"3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5",
 			""
 		};
 
@@ -19,7 +19,7 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2019;
-		var day = 6;
+		var day = 7;
 		var part = 2;
 		var inputType = InputType.Real;
 		string? testExtra = null;

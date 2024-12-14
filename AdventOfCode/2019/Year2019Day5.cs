@@ -5,23 +5,23 @@ namespace AdventOfCode._2019;
 
 public class Year2019Day5 : IDay
 {
-	public Task<string> RunSolution1Async(IList<string> input)
+	public async Task<string> RunSolution1Async(IList<string> input)
 	{
 		var code = input.First().Split(',').Select(int.Parse).ToList();
 		Intcomputer intComputer = new(code);
-		intComputer.Run();
+		await intComputer.RunAsync();
 		Console.WriteLine(string.Join("",intComputer.GetOutputBuffer()));
 
-		return Task.FromResult("");
+		return "";
 	}
 
-	public Task<string> RunSolution2Async(IList<string> input)
+	public async Task<string> RunSolution2Async(IList<string> input)
 	{
 		var code = input.First().Split(',').Select(int.Parse).ToList();
 		Intcomputer intComputer = new(code);
-		intComputer.Run();
+		await intComputer.RunAsync();
 		Console.WriteLine(string.Join("",intComputer.GetOutputBuffer()));
 
-		return Task.FromResult("");
+		return "";
 	}
 }
