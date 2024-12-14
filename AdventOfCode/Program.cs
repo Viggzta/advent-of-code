@@ -18,8 +18,8 @@ internal class Program
 			.SelectMany(s => s.GetTypes())
 			.Where(p => type.IsAssignableFrom(p));
 
-		var year = 2019;
-		var day = 5;
+		var year = 2024;
+		var day = 14;
 		var part = 2;
 		var inputType = InputType.Real;
 		string? testExtra = null;

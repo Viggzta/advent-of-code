@@ -4,6 +4,7 @@ public static class BoilerplateGenerator
 {
 	public static void CreateBoilerplateFile(int year, int day)
 	{
+#if DEBUG
 		var currentPath = Directory.GetCurrentDirectory();
 		var codePath = Path.Combine(currentPath, "..\\..\\..");
 		var yearPath = Path.Combine(codePath, year.ToString());
@@ -26,6 +27,7 @@ public static class BoilerplateGenerator
 		File.WriteAllText(dayPath, outPutText);
 		Console.WriteLine($"A file for year {year} day {day} has been created.");
 		Environment.Exit(0);
+#endif
 	}
 
 	private const string _boilerplateTemplate =
