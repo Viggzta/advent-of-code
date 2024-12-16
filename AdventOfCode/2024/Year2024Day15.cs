@@ -171,8 +171,7 @@ public class Year2024Day15 : IDay
 			.Select(ToDirection)
 			.ToList();
 
-			/*
-			var robotHash = new HashSet<(int x, int y)>();
+			/*var robotHash = new HashSet<(int x, int y)>();
 			robotHash.Add(robot);
 			var boxLeftHash = boxes.Select(box => box.a).ToHashSet();
 			var boxRightHash = boxes.Select(box => box.b).ToHashSet();
@@ -182,8 +181,7 @@ public class Year2024Day15 : IDay
 				('[', boxLeftHash),
 				(']', boxRightHash),
 				('#', walls));
-			Console.ReadKey();
-			*/
+			Console.ReadKey();*/
 
 		foreach ((int x, int y) moveDir in robotMoves)
 		{
@@ -211,18 +209,7 @@ public class Year2024Day15 : IDay
 		*/
 		}
 
-		var robotHash = new HashSet<(int x, int y)>();
-		robotHash.Add(robot);
-		var boxLeftHash = boxes.Select(box => box.a).ToHashSet();
-		var boxRightHash = boxes.Select(box => box.b).ToHashSet();
-		PrintMap(
-			'.',
-			('@', robotHash),
-			('[', boxLeftHash),
-			(']', boxRightHash),
-			('#', walls));
 		var bounds = (walls.Max(x => x.x), walls.Max(y => y.y));
-		Console.WriteLine($"bounds: {bounds}");
 		var boxScores = boxes
 			.OrderBy(x => x.a.y).ThenBy(x=>x.a.x)
 			.Select(p => ToGPSScore(p, bounds))
