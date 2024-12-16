@@ -125,7 +125,6 @@ public class Year2024Day16 : IDay
 		List<((int x, int y) p, (int x, int y) dir, int rotations)> neighbours =
 		[
 			((p.x + dir.x, p.y + dir.y), (dir), 0),
-			((p.x - dir.x, p.y - dir.y), (-dir.x, -dir.y), 2),
 			((p.x + rotatedDir.x, p.y + rotatedDir.y), (rotatedDir), 1),
 			((p.x - rotatedDir.x, p.y - rotatedDir.y), (-rotatedDir.x, -rotatedDir.y), 1)
 		];
@@ -135,6 +134,99 @@ public class Year2024Day16 : IDay
 
 	public Task<string> RunSolution2Async(IList<string> input)
 	{
-		return Task.FromResult("");
+			((int x, int y) start, (int x, int y) end, HashSet<(int x, int y)> walls, HashSet<(int x, int y)> walkables) =
+				ParseInput(input.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).ToList());
+
+		(int x, int y) facingDir = (1, 0);
+
+		(_, int costToEnd) = Djikstra(start, facingDir, end, walkables);
+		List<List<(int x, int y)>> paths = Djikstra2(start, facingDir, end, walkables, costToEnd);
+
+		var flattened = paths
+			.SelectMany(x => x)
+			.ToHashSet();
+
+		Map2D.PrintMap(
+			'.',
+			('X', flattened),
+			('\u2588', walls));
+
+		return Task.FromResult(flattened.Count.ToString());
+	}
+
+	private List<List<(int x, int y)>> Djikstra2(
+		(int x, int y) start,
+		(int x, int y) facingDir,
+		(int x, int y) end,
+		HashSet<(int x, int y)> walkables,
+		int maxCost,
+		int initialCost = 0)
+	{
+		var dist = new Dictionary<(int x, int y), int>();
+		var cameFrom = new Dictionary<(int x, int y), ((int x, int y) p, (int x, int y) dir)>();
+
+		HashSet<((int x, int y) p, (int x, int y) facingDir)> openSet = new HashSet<((int x, int y) p, (int x, int y) facingDir)>();
+		dist.Add(start, initialCost);
+		openSet.Add((start, facingDir));
+
+		while (openSet.Count != 0)
+		{
+			var current = openSet
+				.OrderBy(c => dist.GetValueOrDefault(c.p, int.MaxValue))
+				.First();
+			openSet.Remove(current);
+
+			var validNeighbours = GetNeighbours(
+				current, walkables);
+			if (validNeighbours.Count > 1)
+			{
+				List<List<(int x, int y)>> path = new();
+				bool anyPath = false;
+				foreach (var n in validNeighbours)
+				{
+					var distToNeighbour = dist[current.p] + 1 + 1000 * n.rotations;
+					var pathsToEnd = Djikstra2(n.p, n.dir, end, walkables, maxCost, distToNeighbour);
+					foreach (var possiblePath in pathsToEnd)
+					{
+						if (possiblePath.Count != 0)
+						{
+							path.Add(possiblePath);
+							anyPath = true;
+						}
+					}
+				}
+
+				if (anyPath)
+				{
+					var lPath = ReconstructPath(cameFrom, current.p);
+					path.Add(lPath);
+				}
+
+				return path;
+			}
+			else
+			{
+				foreach (((int x, int y) p, (int x, int y) dir, int rotations) n in validNeighbours)
+				{
+					var distToNeighbour = dist[current.p] + 1 + 1000 * n.rotations;
+					if (distToNeighbour <= maxCost && (!dist.ContainsKey(n.p) || distToNeighbour < dist[n.p]))
+					{
+						dist[n.p] = distToNeighbour;
+						cameFrom[n.p] = current;
+						openSet.Add((n.p, n.dir));
+					}
+				}
+			}
+		}
+
+		if (!dist.TryGetValue(end, out int value) || value != maxCost)
+		{
+			return [];
+		}
+
+		return new List<List<(int x, int y)>>
+		{
+			ReconstructPath(cameFrom, end)
+		};
 	}
 }
