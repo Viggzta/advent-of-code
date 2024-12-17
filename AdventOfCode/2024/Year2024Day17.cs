@@ -68,7 +68,7 @@ public class Year2024Day17 : IDay
 		// long aReg = 0b111111111111111111111111111111111111111111111111;
 		var currentNum = 0;
 		long maxNumber = 7;
-		List<long> nums = Enumerable.Range(0, 17).Select(_ => maxNumber).ToList();
+		List<long> nums = Enumerable.Range(0, prog.Count).Select(_ => maxNumber).ToList();
 		long aReg = nums.Select((n, i) => n << (i * 3)).Sum();
 		//long aReg = 164541034753724;
 		Console.WriteLine();
@@ -81,39 +81,31 @@ public class Year2024Day17 : IDay
 				regLines[2]);
 			await comp.RunAsync();
 			var outString = string.Join(",", comp.GetOutputBuffer());
+			/*
 			if (outString == progAsString)
 			{
 				break;
 			}
+			*/
 
+			Console.Clear();
 			Console.WriteLine(
-				"{0,24} | {1,35} ({2}) | {3} | {4}",
+				"{0,24} | {1,40} | {2,48} | {3}",
+				"RegA",
+				"Program output",
+				"RegA binary",
+				"3bit section (0-7)");
+			Console.WriteLine(
+				"{0,24} | {1,35} ({2,1}) | {3,48} | {4}",
 				aReg,
 				outString,
 				comp.GetOutputBuffer().Count,
 				Convert.ToString(aReg, 2),
 				string.Join(",", nums.Select((n, i) => (i == currentNum) ? $"_{n}_" : n.ToString())));
+			Console.WriteLine("{0,62}", $"Target: {progAsString}");
 			var key = Console.ReadKey();
-			if (key.Key == ConsoleKey.UpArrow)
-			{
-				if (currentNum == 0)
-				{
-					nums[currentNum] += 1;
-				}else
-				{
-					nums[currentNum] = Math.Clamp(nums[currentNum] + 1, 0, maxNumber);
-				}
-			}
-			if (key.Key == ConsoleKey.DownArrow)
-			{
-				if (currentNum == 0)
-				{
-					nums[currentNum] -= 1;
-				}else
-				{
-					nums[currentNum] = Math.Clamp(nums[currentNum] - 1, 0, maxNumber);
-				}
-			}
+			if (key.Key == ConsoleKey.UpArrow) nums[currentNum] = Math.Clamp(nums[currentNum] + 1, 0, maxNumber);
+			if (key.Key == ConsoleKey.DownArrow) nums[currentNum] = Math.Clamp(nums[currentNum] - 1, 0, maxNumber);
 			if (key.Key == ConsoleKey.LeftArrow) currentNum = Math.Clamp(currentNum - 1, 0, nums.Count-1);
 			if (key.Key == ConsoleKey.RightArrow) currentNum = Math.Clamp(currentNum + 1, 0, nums.Count-1);
 			aReg = nums.Select((n, i) => n << (i * 3)).Sum();
