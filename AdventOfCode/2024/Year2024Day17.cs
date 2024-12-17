@@ -8,7 +8,7 @@ public class Year2024Day17 : IDay
 	{
 		var regLines = input
 			.TakeWhile(x => !string.IsNullOrWhiteSpace(x))
-			.Select(x => int.Parse(x.Split(':').Last().Trim()))
+			.Select(x => long.Parse(x.Split(':').Last().Trim()))
 			.ToList();
 		var prog = input
 			.Skip(regLines.Count + 1)
@@ -18,7 +18,7 @@ public class Year2024Day17 : IDay
 			.Last()
 			.Trim()
 			.Split(',')
-			.Select(int.Parse)
+			.Select(long.Parse)
 			.ToList();
 
 		var comp = new ThreeBitComputer.ThreeBitComputer(
@@ -36,7 +36,7 @@ public class Year2024Day17 : IDay
 	{
 		var regLines = input
 			.TakeWhile(x => !string.IsNullOrWhiteSpace(x))
-			.Select(x => int.Parse(x.Split(':').Last().Trim()))
+			.Select(x => long.Parse(x.Split(':').Last().Trim()))
 			.ToList();
 		var prog = input
 			.Skip(regLines.Count + 1)
@@ -46,7 +46,7 @@ public class Year2024Day17 : IDay
 			.Last()
 			.Trim()
 			.Split(',')
-			.Select(int.Parse)
+			.Select(long.Parse)
 			.ToList();
 		var progAsString = string.Join(",", prog);
 
@@ -64,7 +64,14 @@ public class Year2024Day17 : IDay
     while (a != 0)
     */
 
-		int aReg = 294216978;
+		// int aReg = 294216978;
+		// long aReg = 0b111111111111111111111111111111111111111111111111;
+		var currentNum = 0;
+		long maxNumber = 7;
+		List<long> nums = Enumerable.Range(0, 17).Select(_ => maxNumber).ToList();
+		long aReg = nums.Select((n, i) => n << (i * 3)).Sum();
+		//long aReg = 164541034753724;
+		Console.WriteLine();
 		while (true)
 		{
 			var comp = new ThreeBitComputer.ThreeBitComputer(
@@ -79,9 +86,41 @@ public class Year2024Day17 : IDay
 				break;
 			}
 
-			aReg++;
+			Console.WriteLine(
+				"{0,24} | {1,35} ({2}) | {3} | {4}",
+				aReg,
+				outString,
+				comp.GetOutputBuffer().Count,
+				Convert.ToString(aReg, 2),
+				string.Join(",", nums.Select((n, i) => (i == currentNum) ? $"_{n}_" : n.ToString())));
+			var key = Console.ReadKey();
+			if (key.Key == ConsoleKey.UpArrow)
+			{
+				if (currentNum == 0)
+				{
+					nums[currentNum] += 1;
+				}else
+				{
+					nums[currentNum] = Math.Clamp(nums[currentNum] + 1, 0, maxNumber);
+				}
+			}
+			if (key.Key == ConsoleKey.DownArrow)
+			{
+				if (currentNum == 0)
+				{
+					nums[currentNum] -= 1;
+				}else
+				{
+					nums[currentNum] = Math.Clamp(nums[currentNum] - 1, 0, maxNumber);
+				}
+			}
+			if (key.Key == ConsoleKey.LeftArrow) currentNum = Math.Clamp(currentNum - 1, 0, nums.Count-1);
+			if (key.Key == ConsoleKey.RightArrow) currentNum = Math.Clamp(currentNum + 1, 0, nums.Count-1);
+			aReg = nums.Select((n, i) => n << (i * 3)).Sum();
+			//aReg--;
 		}
 
+		// Answer was 164541017976509
 		return aReg.ToString();
 	}
 }

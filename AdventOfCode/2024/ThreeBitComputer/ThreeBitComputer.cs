@@ -3,30 +3,30 @@ namespace AdventOfCode._2024.ThreeBitComputer;
 public class ThreeBitComputer
 {
 	private readonly Dictionary<
-		int,
+		long,
 		Func<
-			List<int>,
-			Dictionary<int, int>,
+			List<long>,
+			Dictionary<int, long>,
 			int,
-			Task<int>>> _operations;
+			Task<long>>> _operations;
 
-	private List<int> _memory;
-	private readonly Func<ThreeBitComputer, Task<int>> _inputAction;
-	private readonly Func<int, Task> _outputAction;
+	private List<long> _memory;
+	private readonly Func<ThreeBitComputer, Task<long>> _inputAction;
+	private readonly Func<long, Task> _outputAction;
 	private int _instructionPointer;
-	private readonly List<int> _outputBuffer;
+	private readonly List<long> _outputBuffer;
 
-	private int _regA;
-	private int _regB;
-	private int _regC;
+	private long _regA;
+	private long _regB;
+	private long _regC;
 
 	public ThreeBitComputer(
-		List<int> memory,
-		int regA,
-		int regB,
-		int regC,
-		Func<ThreeBitComputer, Task<int>>? inputAction = null,
-		Func<int, Task>? outputAction = null)
+		List<long> memory,
+		long regA,
+		long regB,
+		long regC,
+		Func<ThreeBitComputer, Task<long>>? inputAction = null,
+		Func<long, Task>? outputAction = null)
 	{
 		_regA = regA;
 		_regB = regB;
@@ -36,7 +36,13 @@ public class ThreeBitComputer
 		_outputAction = outputAction ?? DefaultOutputAction;
 		_outputBuffer = [];
 		_instructionPointer = 0;
-		_operations = new Dictionary<int, Func<List<int>, Dictionary<int, int>, int, Task<int>>>
+		_operations = new Dictionary<
+			long,
+			Func<
+				List<long>,
+				Dictionary<int, long>,
+				int,
+				Task<long>>>
 		{
 			{ 0, Adv },
 			{ 1, Bxl },
@@ -49,34 +55,34 @@ public class ThreeBitComputer
 		};
 	}
 
-	private Task<int> DefaultInputAction(ThreeBitComputer intcomputer)
+	private Task<long> DefaultInputAction(ThreeBitComputer longcomputer)
 	{
 		Console.WriteLine("Input:");
-		return Task.FromResult(int.Parse(Console.ReadLine() ?? throw new InvalidOperationException()));
+		return Task.FromResult(long.Parse(Console.ReadLine() ?? throw new InvalidOperationException()));
 	}
 
-	private Task DefaultOutputAction(int output)
+	private Task DefaultOutputAction(long output)
 	{
 		return Task.CompletedTask;
 	}
 
-	public int GetAtAddress(int index) => _memory[index];
+	public long GetAtAddress(int index) => _memory[index];
 
-	public List<int> GetOutputBuffer() => _outputBuffer.ToList();
+	public List<long> GetOutputBuffer() => _outputBuffer.ToList();
 	public string GetOutputBufferAsString() => string.Join("", _outputBuffer);
 
-	public List<int> DumpMemory() => _memory.ToList();
+	public List<long> DumpMemory() => _memory.ToList();
 
 	public async Task RunAsync()
 	{
 		var preOpCode = _memory[_instructionPointer];
-		int opcode;
-		Dictionary<int, int> paramModes;
+		long opcode;
+		Dictionary<int, long> paramModes;
 		(paramModes, opcode) = GetInstructions(preOpCode);
 
 		while (_instructionPointer < _memory.Count)
 		{
-			_instructionPointer += await _operations[opcode](_memory, paramModes, _instructionPointer);
+			_instructionPointer += (int)await _operations[opcode](_memory, paramModes, _instructionPointer);
 			if (_instructionPointer >= _memory.Count)
 			{
 				break;
@@ -85,30 +91,30 @@ public class ThreeBitComputer
 		}
 	}
 
-	private (Dictionary<int, int> paramModes, int opcode) GetInstructions(int preOpCode)
+	private (Dictionary<int, long> paramModes, long opcode) GetInstructions(long preOpCode)
 	{
-		Dictionary<int, int> paramModes;
-		int opcode;
+		Dictionary<int, long> paramModes;
+		long opcode;
 		if (preOpCode > 99)
 		{
 			var preOpCodeStr = preOpCode.ToString().Reverse().ToList();
 			paramModes = preOpCodeStr
 				.Skip(2)
-				.Select(c => int.Parse(c.ToString()))
+				.Select(c => long.Parse(c.ToString()))
 				.Index()
 				.ToDictionary(c => c.Index, c => c.Item);
-			opcode = int.Parse(preOpCodeStr[1] + preOpCodeStr[0].ToString());
+			opcode = long.Parse(preOpCodeStr[1] + preOpCodeStr[0].ToString());
 		}
 		else
 		{
 			opcode = preOpCode;
-			paramModes = new Dictionary<int, int>();
+			paramModes = new Dictionary<int, long>();
 		}
 
 		return (paramModes, opcode);
 	}
 
-	private int GetComboOperand(int inputOperand)
+	private long GetComboOperand(long inputOperand)
 	{
 		return inputOperand switch
 		{
@@ -122,35 +128,35 @@ public class ThreeBitComputer
 		};
 	}
 
-	private Task<int> Adv(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Adv(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		var operand = mem[instructionPointer + 1];
 		var numerator = _regA;
-		var denominator = 1 << GetComboOperand(operand);
-		_regA = (int)((double)numerator / (double)denominator);
-		return Task.FromResult(2);
+		var denominator = 1 << (int)GetComboOperand(operand);
+		_regA = (long)((double)numerator / (double)denominator);
+		return Task.FromResult(2L);
 	}
 
-	private Task<int> Bxl(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Bxl(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		var operand = mem[instructionPointer + 1];
 		_regB = _regB ^ operand;
-		return Task.FromResult(2);
+		return Task.FromResult(2L);
 	}
 
-	private Task<int> Bst(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Bst(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		var operand = mem[instructionPointer + 1];
 		var comboOperand = GetComboOperand(operand);
 		_regB = comboOperand % 8;
-		return Task.FromResult(2);
+		return Task.FromResult(2L);
 	}
 
-	private Task<int> Jnz(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Jnz(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		if (_regA == 0)
 		{
-			return Task.FromResult(2);
+			return Task.FromResult(2L);
 		}
 
 		var operand = mem[instructionPointer + 1];
@@ -158,13 +164,13 @@ public class ThreeBitComputer
 		return Task.FromResult(step);
 	}
 
-	private Task<int> Bxc(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Bxc(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		_regB = _regB ^ _regC;
-		return Task.FromResult(2);
+		return Task.FromResult(2L);
 	}
 
-	private async Task<int> Out(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private async Task<long> Out(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		var operand = mem[instructionPointer + 1];
 		var comboOperand = GetComboOperand(operand);
@@ -174,122 +180,21 @@ public class ThreeBitComputer
     		return 2;
 	}
 
-	private Task<int> Bdv(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Bdv(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		var operand = mem[instructionPointer + 1];
 		var numerator = _regA;
-		var denominator = 1 << GetComboOperand(operand);
-		_regB = (int)((double)numerator / (double)denominator);
-		return Task.FromResult(2);
+		var denominator = 1 << (int)GetComboOperand(operand);
+		_regB = (long)((double)numerator / (double)denominator);
+		return Task.FromResult(2L);
 	}
 
-	private Task<int> Cdv(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
+	private Task<long> Cdv(List<long> mem, Dictionary<int, long> paramModes, int instructionPointer)
 	{
 		var operand = mem[instructionPointer + 1];
 		var numerator = _regA;
-		var denominator = 1 << GetComboOperand(operand);
-		_regC = (int)((double)numerator / (double)denominator);
-		return Task.FromResult(2);
-	}
-
-	private Task<int> Add(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		var b = paramModes.TryGetValue(1, out var bMode) && bMode == 1
-			? mem[instructionPointer + 2]
-			: mem[mem[instructionPointer + 2]];
-
-		mem[mem[instructionPointer + 3]] = a + b;
-		return Task.FromResult(4);
-	}
-
-	private Task<int> Mul(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		var b = paramModes.TryGetValue(1, out var bMode) && bMode == 1
-			? mem[instructionPointer + 2]
-			: mem[mem[instructionPointer + 2]];
-
-		mem[mem[instructionPointer + 3]] = a * b;
-		return Task.FromResult(4);
-	}
-
-	private async Task<int> Input(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var input = await _inputAction(this);
-		mem[mem[instructionPointer + 1]] = input;
-		return 2;
-	}
-
-	private async Task<int> Output(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		_outputBuffer.Add(a);
-		await _outputAction(a);
-		return 2;
-	}
-
-	private Task<int> JmpIfTrue(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		var b = paramModes.TryGetValue(1, out var bMode) && bMode == 1
-			? mem[instructionPointer + 2]
-			: mem[mem[instructionPointer + 2]];
-
-		var step = a != 0
-			? -instructionPointer + b
-			: 3;
-		return Task.FromResult(step);
-	}
-
-	private Task<int> JmpIfFalse(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		var b = paramModes.TryGetValue(1, out var bMode) && bMode == 1
-			? mem[instructionPointer + 2]
-			: mem[mem[instructionPointer + 2]];
-
-		var step = a == 0
-			? -instructionPointer + b
-			: 3;
-		return Task.FromResult(step);
-	}
-
-	private Task<int> LessThan(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		var b = paramModes.TryGetValue(1, out var bMode) && bMode == 1
-			? mem[instructionPointer + 2]
-			: mem[mem[instructionPointer + 2]];
-
-		mem[mem[instructionPointer + 3]] = a < b ? 1 : 0;
-
-		return Task.FromResult(4);
-	}
-
-	private Task<int> IsEq(List<int> mem, Dictionary<int, int> paramModes, int instructionPointer)
-	{
-		var a = paramModes.TryGetValue(0, out var aMode) && aMode == 1
-			? mem[instructionPointer + 1]
-			: mem[mem[instructionPointer + 1]];
-		var b = paramModes.TryGetValue(1, out var bMode) && bMode == 1
-			? mem[instructionPointer + 2]
-			: mem[mem[instructionPointer + 2]];
-
-		mem[mem[instructionPointer + 3]] = a == b ? 1 : 0;
-
-		return Task.FromResult(4);
+		var denominator = 1L << (int)GetComboOperand(operand);
+		_regC = (long)((double)numerator / (double)denominator);
+		return Task.FromResult(2L);
 	}
 }
