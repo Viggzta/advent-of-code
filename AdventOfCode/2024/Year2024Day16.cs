@@ -1,4 +1,6 @@
+using System.Collections;
 using AdventOfCode.Utility;
+using System.Collections.Generic;
 
 namespace AdventOfCode._2024;
 
@@ -94,20 +96,35 @@ public class Year2024Day16 : IDay
 			}
 		}
 
-		return (ReconstructPath(cameFrom, end), dist[end]);
+		return (ReconstructPath1(cameFrom, end), dist[end]);
 	}
 
-	private List<(int x, int y)> ReconstructPath(
+	private List<(int x, int y)> ReconstructPath1(
 		Dictionary<(int x, int y), ((int x, int y) p, (int x, int y) dir)> cameFrom,
 		(int x, int y) current)
 	{
 		var currentInternal = current;
-		var path = new List<(int x, int y)>();
+		var path = new System.Collections.Generic.List<(int x, int y)>();
 		path.Add(currentInternal);
 		while (cameFrom.TryGetValue(currentInternal, out var cameFromLocal))
 		{
 			currentInternal = cameFromLocal.p;
 			path.Add(currentInternal);
+		}
+
+		return path;
+	}
+
+	private List<((int x, int y) p, (int x, int y) dir)> ReconstructPath(
+		Dictionary<((int x, int y) p, (int x, int y) dir), ((int x, int y) p, (int x, int y) dir)> cameFrom,
+		((int x, int y) p, (int x, int y) dir) current)
+	{
+		var path = new List<((int x, int y) p, (int x, int y) dir)>();
+		path.Add(current);
+		while (cameFrom.TryGetValue(current, out var cameFromLocal))
+		{
+			current = cameFromLocal;
+			path.Add(current);
 		}
 
 		path.Reverse();
@@ -134,99 +151,106 @@ public class Year2024Day16 : IDay
 
 	public Task<string> RunSolution2Async(IList<string> input)
 	{
-			((int x, int y) start, (int x, int y) end, HashSet<(int x, int y)> walls, HashSet<(int x, int y)> walkables) =
-				ParseInput(input.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).ToList());
+		((int x, int y) start, (int x, int y) end, HashSet<(int x, int y)> walls, HashSet<(int x, int y)> walkables) =
+			ParseInput(input.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).ToList());
 
 		(int x, int y) facingDir = (1, 0);
 
 		(_, int costToEnd) = Djikstra(start, facingDir, end, walkables);
-		List<List<(int x, int y)>> paths = Djikstra2(start, facingDir, end, walkables, costToEnd);
-
-		var flattened = paths
-			.SelectMany(x => x)
-			.ToHashSet();
+		var paths = Djikstra2(
+			(start, facingDir),
+			end,
+			walkables,
+			costToEnd);
 
 		Map2D.PrintMap(
 			'.',
-			('X', flattened),
+			('X', paths),
 			('\u2588', walls));
 
-		return Task.FromResult(flattened.Count.ToString());
+		return Task.FromResult(paths.Count.ToString());
 	}
 
-	private List<List<(int x, int y)>> Djikstra2(
-		(int x, int y) start,
-		(int x, int y) facingDir,
+	private HashSet<(int x, int y)> Djikstra2(
+		((int x, int y) p, (int x, int y) dir) start,
 		(int x, int y) end,
 		HashSet<(int x, int y)> walkables,
 		int maxCost,
 		int initialCost = 0)
 	{
-		var dist = new Dictionary<(int x, int y), int>();
-		var cameFrom = new Dictionary<(int x, int y), ((int x, int y) p, (int x, int y) dir)>();
+		var dist = new Dictionary<((int x, int y) p, (int x, int y) dir), int>();
+		var cameFrom = new Dictionary<
+			((int x, int y) p, (int x, int y) dir),
+			List<((int x, int y) p, (int x, int y) dir)>>();
 
-		HashSet<((int x, int y) p, (int x, int y) facingDir)> openSet = new HashSet<((int x, int y) p, (int x, int y) facingDir)>();
+		HashSet<((int x, int y) p, (int x, int y) facingDir)> openSet =
+			new HashSet<((int x, int y) p, (int x, int y) facingDir)>();
 		dist.Add(start, initialCost);
-		openSet.Add((start, facingDir));
+		openSet.Add(start);
 
 		while (openSet.Count != 0)
 		{
 			var current = openSet
-				.OrderBy(c => dist.GetValueOrDefault(c.p, int.MaxValue))
+				.OrderBy(a => dist.GetValueOrDefault(a, int.MaxValue))
 				.First();
 			openSet.Remove(current);
 
-			var validNeighbours = GetNeighbours(
-				current, walkables);
-			if (validNeighbours.Count > 1)
+			var neighbours = GetNeighbours(current, walkables);
+			foreach (var n in neighbours)
 			{
-				List<List<(int x, int y)>> path = new();
-				bool anyPath = false;
-				foreach (var n in validNeighbours)
-				{
-					var distToNeighbour = dist[current.p] + 1 + 1000 * n.rotations;
-					var pathsToEnd = Djikstra2(n.p, n.dir, end, walkables, maxCost, distToNeighbour);
-					foreach (var possiblePath in pathsToEnd)
-					{
-						if (possiblePath.Count != 0)
-						{
-							path.Add(possiblePath);
-							anyPath = true;
-						}
-					}
-				}
+				var tentativeCost = dist[current] + 1 + 1000 * n.rotations;
+				if (tentativeCost > maxCost) continue;
 
-				if (anyPath)
+				var nNormal = (n.p, n.dir);
+				if (!dist.ContainsKey(nNormal) || tentativeCost <= dist[nNormal])
 				{
-					var lPath = ReconstructPath(cameFrom, current.p);
-					path.Add(lPath);
-				}
-
-				return path;
-			}
-			else
-			{
-				foreach (((int x, int y) p, (int x, int y) dir, int rotations) n in validNeighbours)
-				{
-					var distToNeighbour = dist[current.p] + 1 + 1000 * n.rotations;
-					if (distToNeighbour <= maxCost && (!dist.ContainsKey(n.p) || distToNeighbour < dist[n.p]))
+					if (!cameFrom.ContainsKey(nNormal)) cameFrom[nNormal] = new();
+					if (!cameFrom[nNormal].Contains(current) ||
+							dist.GetValueOrDefault(nNormal, Int32.MaxValue) > tentativeCost)
 					{
-						dist[n.p] = distToNeighbour;
-						cameFrom[n.p] = current;
-						openSet.Add((n.p, n.dir));
+						dist[nNormal] = tentativeCost;
+						openSet.Add(nNormal);
 					}
+
+					cameFrom[nNormal].Add(current);
 				}
 			}
 		}
-
-		if (!dist.TryGetValue(end, out int value) || value != maxCost)
-		{
-			return [];
-		}
-
-		return new List<List<(int x, int y)>>
-		{
-			ReconstructPath(cameFrom, end)
-		};
+		List<((int x, int y) p, (int x, int y) dir)> sources = AllDirections
+			.Select(a => (end, a))
+			.ToList();
+		HashSet<(int x, int y)> megaPath = ReconstructPath2(sources, cameFrom);
+		return megaPath;
 	}
+
+	private HashSet<(int x, int y)> ReconstructPath2(
+		List<((int x, int y) p, (int x, int y) dir)> sources,
+		Dictionary<(
+			(int x, int y) p, (int x, int y) dir),
+			List<((int x, int y) p, (int x, int y) dir)>> cameFrom)
+	{
+		var path = new HashSet<(int, int)>();
+		foreach (var source in sources)
+		{
+			path.Add(source.p);
+			if (cameFrom.TryGetValue(source, out var value))
+			{
+				var internalPaths = ReconstructPath2(value, cameFrom);
+				foreach (var internalPath in internalPaths)
+				{
+					path.Add(internalPath);
+				}
+			}
+		}
+
+		return path;
+	}
+
+	private static readonly List<(int x, int y)> AllDirections =
+	[
+		(1, 0),
+		(-1, 0),
+		(0, 1),
+		(0, -1)
+	];
 }
