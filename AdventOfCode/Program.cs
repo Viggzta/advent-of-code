@@ -9,11 +9,21 @@ internal class Program
 	{
 		var manualInput = new List<string>
 		{
-"Register A: 729",
-"Register B: 0",
-"Register C: 0",
-"",
-"Program: 0,1,5,4,3,0",
+"###############",
+"#...#...#.....#",
+"#.#.#.#.#.###.#",
+"#S#...#.#.#...#",
+"#######.#.#.###",
+"#######.#.#...#",
+"#######.#.###.#",
+"###..E#...#...#",
+"###.#######.###",
+"#...###...#...#",
+"#.#####.#.###.#",
+"#.#...#.#.#...#",
+"#.#.#.#.#.#.###",
+"#...#...#...###",
+"###############",
 			""
 		};
 
@@ -23,7 +33,7 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2024;
-		var day = 19;
+		var day = 20;
 		var part = 2;
 		var inputType = InputType.Real;
 		string? testExtra = null;
