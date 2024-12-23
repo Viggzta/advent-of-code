@@ -9,21 +9,11 @@ internal class Program
 	{
 		var manualInput = new List<string>
 		{
-"###############",
-"#...#...#.....#",
-"#.#.#.#.#.###.#",
-"#S#...#.#.#...#",
-"#######.#.#.###",
-"#######.#.#...#",
-"#######.#.###.#",
-"###..E#...#...#",
-"###.#######.###",
-"#...###...#...#",
-"#.#####.#.###.#",
-"#.#...#.#.#...#",
-"#.#.#.#.#.#.###",
-"#...#...#...###",
-"###############",
+"382A", // 25976
+"463A", // 32410 Ok
+"935A", // 65450
+"279A", // 20088 Ok
+"480A", // 35520 Ok
 			""
 		};
 
@@ -33,9 +23,9 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2024;
-		var day = 23;
-		var part = 2;
-		var inputType = InputType.Real;
+		var day = 21;
+		var part = 1;
+		var inputType = InputType.Manual;
 		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);

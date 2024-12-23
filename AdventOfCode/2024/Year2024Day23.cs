@@ -27,6 +27,7 @@ public class Year2024Day23 : IDay
 			.Where(x => x.Split('-').Any(y => y[0] == 't'))
 			.ToHashSet();
 		var result = resultPre.Count.ToString();
+
 		return Task.FromResult(result);
 	}
 
