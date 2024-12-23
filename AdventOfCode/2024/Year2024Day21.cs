@@ -34,7 +34,7 @@ public class Year2024Day21 : IDay
 			['>'] = (2, 1),
 		};
 
-		List<Numpad> numpads = new List<Numpad>
+		var numpads = new List<Numpad>
 		{
 			new Numpad(nineDigitNumpad),
 			new Numpad(controlNumPad),
@@ -76,31 +76,24 @@ public class Year2024Day21 : IDay
 		return Task.FromResult("");
 	}
 
-	private class Numpad
+	private class Numpad(Dictionary<char, (int x, int y)> numpadMap)
 	{
-		(int x, int y) _pointerPosition;
-		Dictionary<char, (int x, int y)> _numpadMap;
-
-		public Numpad(Dictionary<char, (int x, int y)> numpadMap)
-		{
-			_numpadMap = numpadMap;
-			_pointerPosition = numpadMap['A'];
-		}
+		private (int x, int y) _pointerPosition = numpadMap['A'];
 
 		public string SolveFor(string requiredSteps)
 		{
-			var requredActions = "";
+			var requiredActions = "";
 			foreach (var s in requiredSteps)
 			{
-				requredActions += GetSteps(s);
-				requredActions += 'A';
+				requiredActions += GetSteps(s);
+				requiredActions += 'A';
 			}
-			return requredActions;
+			return requiredActions;
 		}
 
 		string GetSteps(char targetChar)
 		{
-			var targetCharPos = _numpadMap[targetChar];
+			var targetCharPos = numpadMap[targetChar];
 			(int x, int y) deltaPos = (
 				(targetCharPos.x - _pointerPosition.x),
 				(targetCharPos.y - _pointerPosition.y));
@@ -110,9 +103,11 @@ public class Year2024Day21 : IDay
 
 			var outString = "";
 
+			var preferHorizontal = yChar == '^'; // if we just want to move left prioritize horizontal movement
+
 			(int x, int y) horizontalFirstPos = ((_pointerPosition.x + deltaPos.x), _pointerPosition.y);
-			var canDoHorizontalFirst = _numpadMap.Values.Any(x => x == horizontalFirstPos);
-			if (canDoHorizontalFirst)
+			var canDoHorizontalFirst = numpadMap.Values.Any(x => x == horizontalFirstPos);
+			if (canDoHorizontalFirst && preferHorizontal)
 			{
 				outString += new string(xChar, Math.Abs(deltaPos.x));
 				outString += new string(yChar, Math.Abs(deltaPos.y));
@@ -126,13 +121,5 @@ public class Year2024Day21 : IDay
 			_pointerPosition = targetCharPos;
 			return outString;
 		}
-
-		private static readonly Dictionary<(int x, int y), char> dirToCharConvertMap = new()
-		{
-			{ (1, 0), '>' },
-			{ (-1, 0), '<' },
-			{ (0, 1), 'v' },
-			{ (0, -1), '^' },
-		};
 	}
 }

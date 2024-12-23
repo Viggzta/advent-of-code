@@ -9,11 +9,6 @@ internal class Program
 	{
 		var manualInput = new List<string>
 		{
-"382A", // 25976
-"463A", // 32410 Ok
-"935A", // 65450
-"279A", // 20088 Ok
-"480A", // 35520 Ok
 			""
 		};
 
@@ -25,7 +20,7 @@ internal class Program
 		var year = 2024;
 		var day = 21;
 		var part = 1;
-		var inputType = InputType.Manual;
+		var inputType = InputType.Real;
 		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
