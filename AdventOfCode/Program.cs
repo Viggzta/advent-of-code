@@ -9,6 +9,7 @@ internal class Program
 	{
 		var manualInput = new List<string>
 		{
+			"123",
 			""
 		};
 
@@ -18,10 +19,10 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2024;
-		var day = 21;
-		var part = 1;
+		var day = 22;
+		var part = 2;
 		var inputType = InputType.Real;
-		string? testExtra = null;
+		string? testExtra = "p2";
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
 
