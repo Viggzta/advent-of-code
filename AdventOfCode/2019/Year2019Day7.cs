@@ -8,18 +8,18 @@ public class Year2019Day7 : IDay
 {
 	public Task<string> RunSolution1Async(IList<string> input)
 	{
-		var code = input.First().Split(',').Select(int.Parse).ToList();
+		var code = input.First().Split(',').Select(long.Parse).ToList();
 		var permutations = Enumerable.Range(0, 5)
 			.Permute()
 			.Select(x => x.ToList())
 			.ToList();
-		List<int> thrusterCodes = new();
+		List<long> thrusterCodes = new();
 		foreach (var perm in permutations)
 		{
-			var prevResult = 0;
+			var prevResult = 0L;
 			foreach (var phaseSetting in perm)
 			{
-				Queue<int> inputs = new Queue<int>(2);
+				Queue<long> inputs = new Queue<long>(2);
 				inputs.Enqueue(phaseSetting);
 				inputs.Enqueue(prevResult);
 				Intcomputer intcomputer = new Intcomputer(
@@ -37,21 +37,21 @@ public class Year2019Day7 : IDay
 
 	public async Task<string> RunSolution2Async(IList<string> input)
 	{
-		var code = input.First().Split(',').Select(int.Parse).ToList();
+		var code = input.First().Split(',').Select(long.Parse).ToList();
 		var permutations = Enumerable.Range(5, 5)
 			.Permute()
 			.Select(x => x.ToList())
 			.ToList();
-		List<int> thrusterCodes = new();
+		List<long> thrusterCodes = new();
 
 		foreach (var perm in permutations)
 		{
 			var computers = new List<Intcomputer>();
-			var compInputs = new List<ConcurrentQueue<int>>();
+			var compInputs = new List<ConcurrentQueue<long>>();
 			var compInSemaphores = new List<SemaphoreSlim>();
 			perm.ForEach(_ =>
 			{
-				compInputs.Add(new ConcurrentQueue<int>());
+				compInputs.Add(new ConcurrentQueue<long>());
 				compInSemaphores.Add(new SemaphoreSlim(0));
 			});
 			var computerTasks = new List<Task>();

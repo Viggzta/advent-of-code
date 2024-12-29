@@ -7,7 +7,7 @@ public class Year2019Day2 : IDay
 {
 	public async Task<string> RunSolution1Async(IList<string> input)
 	{
-		var code = input.First().Split(',').Select(int.Parse).ToList();
+		var code = input.First().Split(',').Select(long.Parse).ToList();
 		code[1] = 12;
 		code[2] = 2;
 		var intComputer = new Intcomputer(code);
@@ -19,9 +19,9 @@ public class Year2019Day2 : IDay
 
 	public Task<string> RunSolution2Async(IList<string> input)
 	{
-		var code = input.First().Split(',').Select(int.Parse).ToList();
+		var code = input.First().Split(',').Select(long.Parse).ToList();
 
-		var possibleCodes = new List<(List<int> code, int noun, int verb)>();
+		var possibleCodes = new List<(List<long> code, int noun, int verb)>();
 		for (var i = 0; i < 100; i++)
 		{
 			for (var j = 0; j < 100; j++)
