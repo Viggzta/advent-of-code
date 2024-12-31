@@ -58,7 +58,7 @@ public static class InputFetcher
 
 		foreach (Match match in matches)
 		{
-			var currentCode = match.Groups["Code"].Value;
+			var currentCode = SanitizeHtmlTags(match.Groups["Code"].Value);
 			Console.WriteLine(currentCode);
 			Console.WriteLine("Is this the test input? (Y/n)");
 			var yesOrNo = Console.ReadLine();
@@ -71,5 +71,14 @@ public static class InputFetcher
 
 		Console.WriteLine("No test input");
 		return new List<string>();
+	}
+
+	private static string SanitizeHtmlTags(string value)
+	{
+		return value
+			.Replace("&lt;", "<")
+			.Replace("&gt;", ">")
+			.Replace("<em>", "")
+			.Replace("</em>", "");
 	}
 }
