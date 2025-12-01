@@ -7,40 +7,17 @@ internal class Program
 {
 	private static async Task Main(string[] args)
 	{
-		var manualInput = new List<string>
-		{
-".#..##.###...#######",
-"##.############..##.",
-".#.######.########.#",
-".###.#######.####.#.",
-"#####.##.#.##.###.##",
-"..#####..#.#########",
-"####################",
-"#.####....###.#.#.##",
-"##.#################",
-"#####.##.###..####..",
-"..######..##.#######",
-"####.##.####...##..#",
-".#####..#.######.###",
-"##...#.##########...",
-"#.##########.#######",
-".####.#.###.###.#.##",
-"....##.##.###..#####",
-".#.#.###########.###",
-"#.#.#.#####.####.###",
-"###.##.####.##.#..##",
-			""
-		};
+		var manualInput = File.ReadAllText("B:\\Downloads\\input.txt").Split('\n');
 
 		var type = typeof(IDay);
 		var dayTypes = AppDomain.CurrentDomain.GetAssemblies()
 			.SelectMany(s => s.GetTypes())
 			.Where(p => type.IsAssignableFrom(p));
 
-		var year = 2019;
-		var day = 10;
+		var year = 2025;
+		var day = 1;
 		var part = 2;
-		var inputType = InputType.Real;
+		var inputType = InputType.Manual;
 		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
