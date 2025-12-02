@@ -60,7 +60,7 @@ public class Year2025Day1 : IDay
 				zeros += dial / 100;
 			}
 
-			dial %= FixedModulo(dial, 100);
+			dial = FixedModulo(dial, 100);
 		}
 
 		return Task.FromResult(zeros.ToString());
