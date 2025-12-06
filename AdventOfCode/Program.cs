@@ -19,7 +19,7 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2025;
-		var day = 5;
+		var day = 6;
 		var part = 2;
 		var inputType = InputType.Real;
 		string? testExtra = null;
