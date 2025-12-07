@@ -19,9 +19,9 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2025;
-		var day = 6;
+		var day = 7;
 		var part = 2;
-		var inputType = InputType.Real;
+		var inputType = InputType.Example;
 		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
