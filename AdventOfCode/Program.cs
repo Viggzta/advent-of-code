@@ -7,11 +7,7 @@ internal class Program
 {
 	private static async Task Main(string[] args)
 	{
-		var manualInput = new List<string>()
-		{
-			"11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124",
-			"",
-		};
+		var manualInput = File.ReadAllLines(@"C:\Users\victorj\Documents\anders test.txt");
 
 		var type = typeof(IDay);
 		var dayTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -20,8 +16,8 @@ internal class Program
 
 		var year = 2025;
 		var day = 8;
-		var part = 1;
-		var inputType = InputType.Example;
+		var part = 2;
+		var inputType = InputType.Real;
 		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
