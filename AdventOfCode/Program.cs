@@ -15,10 +15,10 @@ internal class Program
 			.Where(p => type.IsAssignableFrom(p));
 
 		var year = 2025;
-		var day = 11;
-		var part = 2;
+		var day = 12;
+		var part = 1;
 		var inputType = InputType.Real;
-		string? testExtra = "2";
+		string? testExtra = null;
 
 		BoilerplateGenerator.CreateBoilerplateFile(year, day);
 

@@ -127,40 +127,28 @@ public class Year2025Day11 : IDay
 			}
 		}
 
-		var result = GetCount2(nodesConnectedToOut, nodesConnectedToOut["svr"], false, false);
-		return Task.FromResult(result.ToString());
+		var srvFft = GetCount2(nodesConnectedToOut, nodesConnectedToOut["svr"], "fft");
+		var srvDac = GetCount2(nodesConnectedToOut, nodesConnectedToOut["svr"], "dac");
+		var fftOut = GetCount2(nodesConnectedToOut, nodesConnectedToOut["fft"], "out");
+		var dacOut = GetCount2(nodesConnectedToOut, nodesConnectedToOut["dac"], "out");
+		return Task.FromResult(srvFft.ToString());
 	}
 
 	private long GetCount2(
 		Dictionary<string, List<string>> nodesConnectedToOut,
 		List<string> list,
-		bool hasVisitedDAC,
-		bool hasVisitedFFT)
+		string targetNode)
 	{
 		long sum = 0;
 		foreach (var l in list)
 		{
-			if (l == "out")
+			if (l == targetNode)
 			{
-				if (hasVisitedDAC && hasVisitedFFT)
-				{
-					sum += 1;
-				}
+				sum += 1;
 				continue;
 			}
 			var temp = nodesConnectedToOut[l];
-			if (l == "dac")
-			{
-				sum += GetCount2(nodesConnectedToOut, temp, true, hasVisitedFFT);
-			}
-			else if (l == "fft")
-			{
-				sum += GetCount2(nodesConnectedToOut, temp, hasVisitedDAC, true);
-			}
-			else
-			{
-				sum += GetCount2(nodesConnectedToOut, temp, hasVisitedDAC, hasVisitedFFT);
-			}
+			sum += GetCount2(nodesConnectedToOut, temp, targetNode);
 		}
 
 		return sum;
